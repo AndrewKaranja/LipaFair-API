@@ -1,19 +1,19 @@
-from api.mpesa.mpesa_express import MpesaExpress
-from api.mpesa.utils import CleanPhoneNumber
-from e_watermeter import settings
+from lipafair import settings
+from mpesa.mpesa_express import MpesaExpress
+from mpesa.utils import CleanPhoneNumber
 
 
 class MpesaSTKPushTxn(object):
     def __init__(self, phone_number=None, amount=None, reference_code=None):
-        self.mpesa_consumer_key = settings.MPESA_CONSUMER_LIVE
-        self.mpesa_secret_key = settings.MPESA_SECRET_LIVE
+        self.mpesa_consumer_key = settings.MPESA_CONSUMER_SANDBOX
+        self.mpesa_secret_key = settings.MPESA_SECRET_SANDBOX
 
         self.phone_number = CleanPhoneNumber(phone_number).sanitize_phone_number()
         self.amount = int(amount)
 
-        self.callback_url = settings.MPESA_STK_CALLBACK
-        self.short_code = settings.MPESA_SHORT_CODE_LIVE
-        self.lnm_passkey = settings.LNM_PASSKEY_LIVE
+        self.callback_url = ""
+        self.short_code = settings.MPESA_SHORT_CODE_SANDBOX
+        self.lnm_passkey = settings.LNM_PASSKEY_SANDBOX
         self.reference_code = reference_code
 
     def initiate_txn(self):

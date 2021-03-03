@@ -1,5 +1,7 @@
+from api.auth import BearerTokenAuth
 from lipafair import settings
 from mpesa.mpesa_auth import MpesaBaseAuth
+from mpesa.utils import CleanPhoneNumber
 
 
 class B2C(MpesaBaseAuth):
