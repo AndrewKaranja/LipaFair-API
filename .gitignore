@@ -262,23 +262,3 @@ fabric.properties
 
 # End of https://www.gitignore.io/api/pycharm,python,django
 
-.gitignore
-.idea/inspectionProfiles/
-.idea/lipafair.iml
-.idea/misc.xml
-.idea/modules.xml
-.idea/vcs.xml
-api/__init__.py
-api/admin.py
-api/apps.py
-api/auth.py
-api/migrations/__init__.py
-api/models.py
-api/tests.py
-api/views.py
-lipafair/__init__.py
-lipafair/settings.py
-lipafair/urls.py
-lipafair/wsgi.py
-manage.py
-mpesa/
