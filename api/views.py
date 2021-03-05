@@ -29,8 +29,8 @@ class WalletListCreatePIView(generics.ListCreateAPIView):
 class WalletDetailView(generics.RetrieveUpdateDestroyAPIView):
      serializer_class = WalletSerializer
      def get_object(self):
-         wallet_id = self.kwargs.get("wallet_id")
-         return get_object_or_404(Wallet, wallet_id=wallet_id)
+         user_id = self.kwargs.get("user_id")
+         return get_object_or_404(Wallet, user_id=user_id)
 
 
 

@@ -9,7 +9,7 @@ from mpesa.payment_signals import stk_payment_completed
 class Wallet(models.Model):
     #same as docKey
     wallet_id = models.CharField(max_length=128,)
-    user_id = models.CharField(max_length=128,)
+    user_id = models.CharField(max_length=128, unique=True)
     current_balance = models.DecimalField(max_digits=9, decimal_places=2)
     last_updated = models.DateTimeField(auto_now_add=True)
 
