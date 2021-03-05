@@ -4,14 +4,14 @@ from mpesa.utils import CleanPhoneNumber
 
 
 class MpesaSTKPushTxn(object):
-    def __init__(self, phone_number=None, amount=None, reference_code=None):
+    def __init__(self, phone_number=None, amount=None, reference_code=None, callback_url=None):
         self.mpesa_consumer_key = settings.MPESA_CONSUMER_SANDBOX
         self.mpesa_secret_key = settings.MPESA_SECRET_SANDBOX
 
         self.phone_number = CleanPhoneNumber(phone_number).sanitize_phone_number()
         self.amount = int(amount)
 
-        self.callback_url = ""
+        self.callback_url = callback_url
         self.short_code = settings.MPESA_SHORT_CODE_SANDBOX
         self.lnm_passkey = settings.LNM_PASSKEY_SANDBOX
         self.reference_code = reference_code
@@ -29,7 +29,7 @@ class MpesaSTKPushTxn(object):
             amount=self.amount,
             callback_url=self.callback_url,
             phone_number=self.phone_number,
-            description='water units',
+            description='lipafair',
             reference_code=self.reference_code
 
         )
