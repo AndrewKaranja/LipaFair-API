@@ -91,3 +91,59 @@ class TopUpWalletCallback(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND, data={
                 'message': "No transaction Record found"
             })
+
+
+class DirectSTKCheckoutRequest(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        amount = data.get('amount', '')
+        phone_number = data.get('phone_number', '')
+        account= data.get('account', '')
+        stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=account,
+                                      callback_url="https://796cde2e785f.ngrok.io/api/stk-checkout-callback/")
+        response = dict(stk_request.initiate_txn())
+
+        if response.get('ResponseCode') == '0':
+            txn =  MpesaTransaction.objects.create(
+                txn_id=response.get('CheckoutRequestID'),
+                reason="Direct checkout",
+                amount=Decimal(amount),
+                account=phone_number,
+                txn_type="Checkout"
+
+            )
+            txn.save()
+            return Response(status=status.HTTP_200_OK, data={
+                'message': "Request sent successfully check your phone to complete payment"
+            })
+
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data={
+                                'message': 'Error occurred while processing your request. Please try again later'}
+                            )
+
+class DirectCheckoutSTKCallback(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        stk_body = data.get('Body').get('stkCallback')
+        checkout_request_id = stk_body.get('CheckoutRequestID')
+        mpesa_receipt = stk_body.get('CallbackMetadata').get('Item')[1].get('Value')
+        result_code = stk_body.get('ResultCode')
+
+        try:
+            payment = MpesaTransaction.objects.get(txn_id=checkout_request_id)
+            if str(result_code) == '0':
+                payment.mpesa_receipt = mpesa_receipt
+                if payment.status == 'pending':
+                    stk_payment_completed.send(sender=self.__class__, transaction=payment)
+                payment.status = "success"
+                payment.save()
+            else:
+                payment.status = 'failed'
+                payment.save()
+            return Response(status=status.HTTP_200_OK)
+        except MpesaTransaction.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={
+                'message': "No transaction Record found"
+            })
