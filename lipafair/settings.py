@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import dj_database_url
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -23,9 +25,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'o27e1-&cn1td3v9tn430t_ft%engv8$6h%=ec#)ek3(=g7e+z*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+
+
+PROD = True
+
+if PROD:
+    ALLOWED_HOSTS = ['.herokuapp.com']
+else:
+    ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -80,6 +88,12 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+if PROD:
+    DATABASES['default'].update(dj_database_url.config(conn_max_age=500, ssl_require=True))
+
+    # Honor the 'X-Forwarded-Proto' header for request.is_secure()
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Password validation
