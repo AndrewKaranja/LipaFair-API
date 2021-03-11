@@ -16,7 +16,7 @@ import os
 import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -35,7 +35,6 @@ if PROD:
 else:
     ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'api',
 ]
 
@@ -78,7 +78,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lipafair.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -94,7 +93,6 @@ if PROD:
 
     # Honor the 'X-Forwarded-Proto' header for request.is_secure()
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -114,7 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -128,11 +125,26 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static_files'),
+)
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static_root')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, '/media_files/')
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+
+
+
 
 MPESA_CONSUMER_SANDBOX = 'X2UxjtUhIeGh6DCXyYQfb9yBQGl101KY'
 
@@ -148,7 +160,6 @@ B2C_SANDBOX_TIMEOUT_URL = 'https://9ac5f796219f.ngrok.io/api/b2c-callback/'
 
 B2C_SANDBOX_INITIATOR_NAME = 'apiop70'
 
-
 B2C_SANDBOX_PAYBILL = "602950"
 
 MPESA_SHORT_CODE_SANDBOX = 174379
@@ -156,7 +167,6 @@ MPESA_SHORT_CODE_LIVE = 885543
 
 MPESA_B2C_TEST_MSISDN = "254708374149"
 
-LNM_PASSKEY_SANDBOX= 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
-
+LNM_PASSKEY_SANDBOX = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
 
 MPESA_SANBOX_PASSWORD = 'QTcLhF7RyITHbtrEdyEZU3S/h/Vs0p0aYbW8nNIz8V/P4O23IL1xu/3E0BgbBOFihTJ7HtlPLbEeGObQGMrAxXlfr83ux/m/dCIa//uSLBF+WbEJ+os3Ryt/NkvGxKknXwUdfiQlo9RS7pFseZD8pZT4z8fFEA+ruFrbxvJQ8pZRsDuJ0VfEk+IeB+/GAdWSbE6mvDRvODMdZ6+1CMTxQ91EtA70eM3S3paalbfd33wFE0OxG8zb5o4nNJjmLWsklMyKIr8tcaQHo/ZqJykPjlYiSoIzXvAu/ZJar6xnkOTfo/njZINHY56dlT4pDX19ekCm4si+daylzSxRKAN9dw=='
