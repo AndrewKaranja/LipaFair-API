@@ -26,12 +26,13 @@ class WalletListCreatePIView(generics.ListCreateAPIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
-class WalletDetailView(generics.RetrieveUpdateDestroyAPIView):
-     serializer_class = WalletSerializer
-     def get_object(self):
-         user_id = self.kwargs.get("user_id")
-         return get_object_or_404(Wallet, user_id=user_id)
 
+class WalletDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = WalletSerializer
+
+    def get_object(self):
+        user_id = self.kwargs.get("user_id")
+        return get_object_or_404(Wallet, user_id=user_id)
 
 
 class TopUpWalletRequest(APIView):
@@ -40,11 +41,12 @@ class TopUpWalletRequest(APIView):
         wallet_id = data.get('wallet_id', '')
         amount = data.get('amount', '')
         phone_number = data.get('phone_number', '')
-        stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=wallet_id, callback_url="https://6d97fd8ec86b.ngrok.io/api/wallettopup-callback/")
+        stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=wallet_id,
+                                      callback_url="https://2f06e025e42d.ngrok.io/api/wallettopup-callback/")
         response = dict(stk_request.initiate_txn())
         print(response)
         if response.get('ResponseCode') == '0':
-            txn =  MpesaTransaction.objects.create(
+            txn = MpesaTransaction.objects.create(
                 txn_id=response.get('CheckoutRequestID'),
                 reason="Topping up the wallet",
                 amount=Decimal(amount),
@@ -63,7 +65,6 @@ class TopUpWalletRequest(APIView):
                             data={
                                 'message': 'Error occurred while processing your request. Please try again later'}
                             )
-
 
 
 class TopUpWalletCallback(APIView):
@@ -98,13 +99,13 @@ class DirectSTKCheckoutRequest(APIView):
         data = request.data
         amount = data.get('amount', '')
         phone_number = data.get('phone_number', '')
-        account= data.get('account', '')
+        account = data.get('account', '')
         stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=account,
-                                      callback_url="https://796cde2e785f.ngrok.io/api/stk-checkout-callback/")
+                                      callback_url="https://2f06e025e42d.ngrok.io/api/stk-checkout-callback/")
         response = dict(stk_request.initiate_txn())
 
         if response.get('ResponseCode') == '0':
-            txn =  MpesaTransaction.objects.create(
+            txn = MpesaTransaction.objects.create(
                 txn_id=response.get('CheckoutRequestID'),
                 reason="Direct checkout",
                 amount=Decimal(amount),
@@ -122,6 +123,7 @@ class DirectSTKCheckoutRequest(APIView):
                             data={
                                 'message': 'Error occurred while processing your request. Please try again later'}
                             )
+
 
 class DirectCheckoutSTKCallback(APIView):
     def post(self, request, *args, **kwargs):

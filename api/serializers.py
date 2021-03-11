@@ -10,6 +10,7 @@ class WalletSerializer(serializers.ModelSerializer):
 
 
 class MpesaTransactionSerializer(serializers.ModelSerializer):
+    txn_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     class Meta:
         model = MpesaTransaction
         fields = '__all__'
