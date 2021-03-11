@@ -8,7 +8,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 
 from api.models import Wallet, MpesaTransaction
-from api.serializers import WalletSerializer
+from api.serializers import WalletSerializer, MpesaTransactionSerializer
 from mpesa.payment import MpesaSTKPushTxn
 from mpesa.payment_signals import stk_payment_completed
 
@@ -40,7 +40,7 @@ class TopUpWalletRequest(APIView):
         wallet_id = data.get('wallet_id', '')
         amount = data.get('amount', '')
         phone_number = data.get('phone_number', '')
-        stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=wallet_id, callback_url="https://f411715928f5.ngrok.io/api/wallettopup-callback/")
+        stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=wallet_id, callback_url="https://6d97fd8ec86b.ngrok.io/api/wallettopup-callback/")
         response = dict(stk_request.initiate_txn())
         print(response)
         if response.get('ResponseCode') == '0':
@@ -147,3 +147,10 @@ class DirectCheckoutSTKCallback(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND, data={
                 'message': "No transaction Record found"
             })
+
+
+class TransactionsListAPIView(generics.ListAPIView):
+    serializer_class = MpesaTransactionSerializer
+
+    def get_queryset(self):
+        return MpesaTransaction.objects.filter(account=self.kwargs.get('wallet_id', '')).order_by('txn_date')

@@ -36,6 +36,10 @@ class MpesaTransaction(models.Model):
     status = models.CharField(max_length=32, choices=TXN_STATUS, default=TXN_STATUS[0][0])
     txn_date = models.DateTimeField(auto_now_add=True)
 
+
+    class Meta:
+        ordering = ('-txn_date', )
+
     def __str__(self):
         return self.txn_id
 
