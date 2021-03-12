@@ -42,7 +42,7 @@ class TopUpWalletRequest(APIView):
         amount = data.get('amount', '')
         phone_number = data.get('phone_number', '')
         stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=wallet_id,
-                                      callback_url="https://2f06e025e42d.ngrok.io/api/wallettopup-callback/")
+                                      callback_url="https://lipafair.herokuapp.com/api/wallettopup-callback/")
         response = dict(stk_request.initiate_txn())
         print(response)
         if response.get('ResponseCode') == '0':
@@ -101,7 +101,7 @@ class DirectSTKCheckoutRequest(APIView):
         phone_number = data.get('phone_number', '')
         account = data.get('account', '')
         stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=account,
-                                      callback_url="https://2f06e025e42d.ngrok.io/api/stk-checkout-callback/")
+                                      callback_url="https://lipafair.herokuapp.com/api/stk-checkout-callback/")
         response = dict(stk_request.initiate_txn())
 
         if response.get('ResponseCode') == '0':
