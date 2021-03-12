@@ -17,6 +17,7 @@ class Wallet(models.Model):
         return self.wallet_id
 
 class MpesaTransaction(models.Model):
+    user_id = models.CharField(max_length=128, null=True,blank=True)
     txn_id = models.CharField(max_length=128, )
     mpesa_receipt = models.CharField(max_length=32, blank=True, null=True,default="")
     amount = models.DecimalField(decimal_places=2, max_digits=9)

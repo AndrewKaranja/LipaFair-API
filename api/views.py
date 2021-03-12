@@ -40,6 +40,7 @@ class TopUpWalletRequest(APIView):
         data = request.data
         wallet_id = data.get('wallet_id', '')
         amount = data.get('amount', '')
+        user_id = data.get('user_id', '')
         phone_number = data.get('phone_number', '')
         stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=wallet_id,
                                       callback_url="https://lipafair.herokuapp.com/api/wallettopup-callback/")
@@ -47,6 +48,7 @@ class TopUpWalletRequest(APIView):
         print(response)
         if response.get('ResponseCode') == '0':
             txn = MpesaTransaction.objects.create(
+                user_id=user_id,
                 txn_id=response.get('CheckoutRequestID'),
                 reason="Topping up the wallet",
                 amount=Decimal(amount),
@@ -98,6 +100,7 @@ class DirectSTKCheckoutRequest(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         amount = data.get('amount', '')
+        user_id = data.get('user_id', '')
         phone_number = data.get('phone_number', '')
         account = data.get('account', '')
         stk_request = MpesaSTKPushTxn(phone_number=phone_number, amount=amount, reference_code=account,
@@ -106,10 +109,11 @@ class DirectSTKCheckoutRequest(APIView):
 
         if response.get('ResponseCode') == '0':
             txn = MpesaTransaction.objects.create(
+                user_id=user_id,
                 txn_id=response.get('CheckoutRequestID'),
                 reason="Direct checkout",
                 amount=Decimal(amount),
-                account=phone_number,
+                account=account,
                 txn_type="Checkout"
 
             )
@@ -155,4 +159,4 @@ class TransactionsListAPIView(generics.ListAPIView):
     serializer_class = MpesaTransactionSerializer
 
     def get_queryset(self):
-        return MpesaTransaction.objects.filter(account=self.kwargs.get('wallet_id', '')).order_by('txn_date')
+        return MpesaTransaction.objects.filter(user_id=self.kwargs.get('user_id', '')).order_by('txn_date')

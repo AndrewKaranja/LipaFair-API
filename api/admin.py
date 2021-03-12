@@ -11,6 +11,7 @@ class WalletAdmin(admin.ModelAdmin):
 @admin.register(MpesaTransaction)
 class MpesaTransactionAdmin(admin.ModelAdmin):
     list_display = [
+        'user_id',
         'txn_id',
         'mpesa_receipt',
         'amount',
