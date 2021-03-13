@@ -166,3 +166,11 @@ MPESA_B2C_TEST_MSISDN = "254708374149"
 LNM_PASSKEY_SANDBOX = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
 
 MPESA_SANBOX_PASSWORD = 'QTcLhF7RyITHbtrEdyEZU3S/h/Vs0p0aYbW8nNIz8V/P4O23IL1xu/3E0BgbBOFihTJ7HtlPLbEeGObQGMrAxXlfr83ux/m/dCIa//uSLBF+WbEJ+os3Ryt/NkvGxKknXwUdfiQlo9RS7pFseZD8pZT4z8fFEA+ruFrbxvJQ8pZRsDuJ0VfEk+IeB+/GAdWSbE6mvDRvODMdZ6+1CMTxQ91EtA70eM3S3paalbfd33wFE0OxG8zb5o4nNJjmLWsklMyKIr8tcaQHo/ZqJykPjlYiSoIzXvAu/ZJar6xnkOTfo/njZINHY56dlT4pDX19ekCm4si+daylzSxRKAN9dw=='
+
+FIREBASE_FUNC_USERNAME = "brian123@gmail.com"
+
+FIREBASE_FUNC_PASSWORD = "134567"
+
+FIREBASE_FUNC_AUTH_URL = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/login"
+
+UPDATE_STORE_WALLET_ENDPOINT = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/update-wallet"

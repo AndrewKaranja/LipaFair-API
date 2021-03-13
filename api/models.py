@@ -3,6 +3,7 @@ from _decimal import Decimal
 from django.db import models
 
 # Create your models here.
+from api.wallet_manager import StoreWalletManager
 from mpesa.payment_signals import stk_payment_completed
 
 
@@ -58,7 +59,15 @@ def on_stk_checkout_completed(sender, **kwargs):
         wallet.save()
     else:
         #implement other checkout here
-        pass
+        payload = {
+            "accountNo": str(transaction.account),
+            "amount": int(transaction.ammount),
+            "transactionType": "credit"
+        }
+
+        wallet_manager = StoreWalletManager()
+        print(wallet_manager.update_wallet(payload=payload))
+
 
 stk_payment_completed.connect(on_stk_checkout_completed)
 
