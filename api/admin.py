@@ -22,3 +22,7 @@ class MpesaTransactionAdmin(admin.ModelAdmin):
         'txn_date'
     ]
 
+@admin.register(WalletTransaction)
+class WalletTransactionAdmin(admin.ModelAdmin):
+
+    list_display = [field.name for field in WalletTransaction._meta.get_fields()][1:]

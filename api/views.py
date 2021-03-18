@@ -1,3 +1,4 @@
+import uuid
 from _decimal import Decimal
 
 from django.shortcuts import render, get_object_or_404
@@ -7,10 +8,10 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.views import APIView
 
-from api.models import Wallet, MpesaTransaction
+from api.models import Wallet, MpesaTransaction, WalletTransaction
 from api.serializers import WalletSerializer, MpesaTransactionSerializer
 from mpesa.payment import MpesaSTKPushTxn
-from mpesa.payment_signals import stk_payment_completed
+from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed
 
 
 class WalletListCreatePIView(generics.ListCreateAPIView):
@@ -160,3 +161,45 @@ class TransactionsListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return MpesaTransaction.objects.filter(user_id=self.kwargs.get('user_id', '')).order_by('txn_date')
+
+
+class CheckoutFromWalletAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        client_wallet_id = data.get('client_wallet_id')
+        store_account_no = data.get('account_no')
+        amount = data.get('amount')
+
+        try:
+            client_wallet = Wallet.objects.get(wallet_id=client_wallet_id)
+            #check the available balance now
+
+            balance = int(client_wallet.current_balance)
+            if balance >= int(amount):
+                # complete transaction since the funds are available
+                txn = WalletTransaction.objects.create(
+                    user_id=data.get('user_id'),
+                    txn_id=uuid.uuid4().hex.upper(),
+                    amount=amount,
+                    account=store_account_no,
+                    status="success"
+                )
+                txn.save()
+                checkout_from_wallet_completed.send(sender=self.__class__, client_wallet=client_wallet, transaction=txn)
+                return Response(status=status.HTTP_200_OK, data={
+                    'message': "Checkout completed successfully"
+                })
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                    'message': f"You do not have sufficient funds to complete the transaction. Your current balance is Ksh {client_wallet.current_balance}"
+                })
+
+        except Wallet.DoesNotExist as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                'message': "Could not find a matching client wallet."
+            })
+
+
+
+

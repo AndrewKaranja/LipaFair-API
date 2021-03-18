@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 from api.wallet_manager import StoreWalletManager
-from mpesa.payment_signals import stk_payment_completed
+from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed
 
 
 class Wallet(models.Model):
@@ -45,6 +45,25 @@ class MpesaTransaction(models.Model):
     def __str__(self):
         return self.txn_id
 
+class WalletTransaction(models.Model):
+    user_id = models.CharField(max_length=128, null=False, blank=False)
+    txn_id = models.CharField(max_length=128, null=False, blank=False)
+    amount = models.DecimalField(decimal_places=2, max_digits=9)
+    account = models.CharField(max_length=128, )
+    txn_type = models.CharField(max_length=32, default="CheckoutFromWallet")
+    TXN_STATUS = (
+        ('pending', 'pending'),
+        ('failed', 'failed'),
+        ('success', 'success'),
+    )
+    status = models.CharField(max_length=32, choices=TXN_STATUS, default=TXN_STATUS[0][0])
+    txn_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-txn_date', )
+
+    def __str__(self):
+        return self.txn_id
 
 
 def on_stk_checkout_completed(sender, **kwargs):
@@ -72,3 +91,20 @@ def on_stk_checkout_completed(sender, **kwargs):
 stk_payment_completed.connect(on_stk_checkout_completed)
 
 
+def on_checkout_from_wallet_completed(sender, **kwargs):
+    transaction = kwargs.get('transaction')
+
+    client_wallet = kwargs.get('client_wallet')
+    client_wallet.current_balance -= Decimal(transaction.amount)
+    client_wallet.save()
+
+    payload = {
+        "accountNo": str(transaction.account),
+        "amount": int(transaction.ammount),
+        "transactionType": "credit"
+    }
+
+    wallet_manager = StoreWalletManager()
+    print(wallet_manager.update_wallet(payload=payload))
+
+checkout_from_wallet_completed.connect(on_checkout_from_wallet_completed)
