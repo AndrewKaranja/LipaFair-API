@@ -9,4 +9,5 @@ urlpatterns = [
     path('stk-checkout/', views.DirectSTKCheckoutRequest.as_view()),
     path('stk-checkout-callback/', views.DirectCheckoutSTKCallback.as_view()),
     path('mpesa-transactions/<user_id>/', views.TransactionsListAPIView.as_view()),
+    path('wallet-checkout/', views.CheckoutFromWalletAPIView.as_view()),
 ]
