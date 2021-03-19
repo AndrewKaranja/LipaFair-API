@@ -8,8 +8,11 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.views import APIView
 
-from api.models import Wallet, MpesaTransaction, WalletTransaction
+from api.models import Wallet, MpesaTransaction, WalletTransaction, B2CWithdrawalRequest
 from api.serializers import WalletSerializer, MpesaTransactionSerializer
+from api.wallet_manager import StoreWalletManager
+from lipafair import settings
+from mpesa.b2c import B2C
 from mpesa.payment import MpesaSTKPushTxn
 from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed
 
@@ -200,6 +203,86 @@ class CheckoutFromWalletAPIView(APIView):
                 'message': "Could not find a matching client wallet."
             })
 
+
+
+
+class WithdrawFromWallet(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        store_wallet_id = data.get('store_wallet_id', '')
+
+        amount = int(data.get('amount', 0))
+
+        #get the store
+        manager = StoreWalletManager()
+        wallet_data = dict(manager.get_wallet(account_no=store_wallet_id))
+
+        if wallet_data.get('status') == status.HTTP_200_OK:
+            available_balance = int(wallet_data.get('amount',  0))
+            if available_balance >=amount:
+                #funds available for withdrawal
+
+                b2c_api = B2C(env=settings.MPESA_ENV)
+                phone_number = settings.MPESA_B2C_TEST_MSISDN if settings.MPESA_ENV == 'sandbox' else data.get(
+                    'phone_number')
+                result = dict(
+                    b2c_api.initiate_b2c(phone_number=phone_number, amount=data.get('amount'),
+                                         occasion=data.get('occasion')))
+
+                print(result)
+                if result.__contains__("ResponseCode"):
+
+                    if result.get('ResponseCode').strip() == '0':
+                        withdrawal_request = B2CWithdrawalRequest.objects.create(
+                            account_no=data.get('username'),
+                            txn_id=result.get('ConversationID'),
+                            txn_ref="",
+                            amount=data.get('amount'),
+                            phone_number=phone_number,
+                            customer_name=""
+                        )
+                        withdrawal_request.save()
+                        return Response(status=status.HTTP_200_OK,
+                                        data={'message': "Request submitted successfully for processing"})
+                    else:
+                        return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                            'message': "Error occurred while processing your request try again later."
+                        })
+
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                    'message': "You do not have sufficient balance."
+                })
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                'message': "Unable to get matching wallet details."
+            })
+
+
+
+class WalletWithdrawalCallback(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        callback_result = data.get('Result')
+        print(callback_result)
+
+        if str(callback_result.get('ResultCode')) == '0':
+            txn_id = callback_result.get('ConversationID')
+            try:
+                txn = B2CWithdrawalRequest.objects.get(txn_id=txn_id, status='pending')
+                if txn:
+                    txn.status = 'success'
+                    txn.txn_ref = str(callback_result.get('TransactionID'))
+                    txn.customer_name = callback_result.get('ResultParameters').get('ResultParameter')[2].get('Value')
+                    txn.save()
+
+                    return Response(status=status.HTTP_200_OK, data={"message": "Funds transferred successfully."})
+            except B2CWithdrawalRequest.DoesNotExist as e:
+                return Response(status=status.HTTP_400_BAD_REQUEST,
+                                data={"message": "Error occurred while transferring funds please try again later"})
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data={"message": "Unable to complete your request for now."})
 
 
 

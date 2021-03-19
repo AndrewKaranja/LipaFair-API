@@ -174,3 +174,5 @@ FIREBASE_FUNC_PASSWORD = "134567"
 FIREBASE_FUNC_AUTH_URL = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/login"
 
 UPDATE_STORE_WALLET_ENDPOINT = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/update-wallet"
+
+STORE_WALLET_URL = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/wallet/"

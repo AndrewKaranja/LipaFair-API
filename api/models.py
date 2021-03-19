@@ -66,6 +66,24 @@ class WalletTransaction(models.Model):
         return self.txn_id
 
 
+class B2CWithdrawalRequest(models.Model):
+    account_no = models.CharField(max_length=32, null=False, blank=False)
+    txn_id = models.CharField(max_length=256, )
+    txn_ref = models.CharField(max_length=128, null=True, blank=True)
+    amount = models.CharField(max_length=20, )
+    phone_number = models.CharField(max_length=20, )
+    customer_name = models.CharField(max_length=128, null=True, blank=True)
+    remarks = models.CharField(max_length=140, default="Wallet Withdrawal")
+    status = models.CharField(max_length=32, default="pending")
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-date',)
+
+    def __str__(self):
+        return self.txn_id
+
+
 def on_stk_checkout_completed(sender, **kwargs):
     transaction = kwargs.get('transaction')
     txn_type = transaction.txn_type
