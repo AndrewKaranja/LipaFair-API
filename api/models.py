@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 from api.wallet_manager import StoreWalletManager
-from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed
+from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed, b2c_payment_completed
 
 
 class Wallet(models.Model):
@@ -126,3 +126,16 @@ def on_checkout_from_wallet_completed(sender, **kwargs):
     print(wallet_manager.update_wallet(payload=payload))
 
 checkout_from_wallet_completed.connect(on_checkout_from_wallet_completed)
+
+
+def on_wallet_withdrawal_completed(sender, **kwargs):
+    transaction = kwargs.get('transaction')
+    payload = {
+        "accountNo": str(transaction.account),
+        "amount": int(transaction.ammount),
+        "transactionType": "debit"
+    }
+    wallet_manager = StoreWalletManager()
+    print(wallet_manager.update_wallet(payload=payload))
+
+b2c_payment_completed.connect(on_wallet_withdrawal_completed)

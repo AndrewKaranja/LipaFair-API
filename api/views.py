@@ -14,7 +14,7 @@ from api.wallet_manager import StoreWalletManager
 from lipafair import settings
 from mpesa.b2c import B2C
 from mpesa.payment import MpesaSTKPushTxn
-from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed
+from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed, b2c_payment_completed
 
 
 class WalletListCreatePIView(generics.ListCreateAPIView):
@@ -223,11 +223,9 @@ class WithdrawFromWallet(APIView):
                 #funds available for withdrawal
 
                 b2c_api = B2C(env=settings.MPESA_ENV)
-                phone_number = settings.MPESA_B2C_TEST_MSISDN if settings.MPESA_ENV == 'sandbox' else data.get(
-                    'phone_number')
-                result = dict(
-                    b2c_api.initiate_b2c(phone_number=phone_number, amount=data.get('amount'),
-                                         occasion=data.get('occasion')))
+                phone_number = settings.MPESA_B2C_TEST_MSISDN if settings.MPESA_ENV == 'sandbox' else data.get('phone_number')
+
+                result = dict(b2c_api.initiate_b2c(phone_number=phone_number, amount=data.get('amount'),occasion=data.get('occasion')))
 
                 print(result)
                 if result.__contains__("ResponseCode"):
@@ -271,9 +269,14 @@ class WalletWithdrawalCallback(APIView):
             try:
                 txn = B2CWithdrawalRequest.objects.get(txn_id=txn_id, status='pending')
                 if txn:
+                    if txn.status == 'pending':
+                        #send a signal to update the wallet signal should be sent once. that is why we send it before switching from pending to success status
+                        b2c_payment_completed.send(sender=self.__class__, transaction=txn)
+
                     txn.status = 'success'
                     txn.txn_ref = str(callback_result.get('TransactionID'))
                     txn.customer_name = callback_result.get('ResultParameters').get('ResultParameter')[2].get('Value')
+
                     txn.save()
 
                     return Response(status=status.HTTP_200_OK, data={"message": "Funds transferred successfully."})
