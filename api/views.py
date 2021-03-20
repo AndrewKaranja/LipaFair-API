@@ -246,6 +246,10 @@ class WithdrawFromWallet(APIView):
                         return Response(status=status.HTTP_400_BAD_REQUEST, data={
                             'message': "Error occurred while processing your request try again later."
                         })
+                else:
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                        'message': "Unable to get response from b2c api."
+                    })
 
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={
