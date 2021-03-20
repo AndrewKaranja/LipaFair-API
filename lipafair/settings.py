@@ -150,9 +150,9 @@ MPESA_ENV = 'sandbox'
 
 B2C_INITIATOR_PASSWORD = "APItest2950#"
 
-B2C_SANDBOX_CALLBACK_URL = 'https://3e5d661fda05.ngrok.io/api/b2c-callback/'
+B2C_SANDBOX_CALLBACK_URL = 'http://lipafair.herokuapp.com/api/withdraw-from-wallet-callback/'
 
-B2C_SANDBOX_TIMEOUT_URL = 'https://9ac5f796219f.ngrok.io/api/b2c-callback/'
+B2C_SANDBOX_TIMEOUT_URL = 'http://lipafair.herokuapp.com/api/withdraw-from-wallet-callback/'
 
 B2C_SANDBOX_INITIATOR_NAME = 'apiop70'
 
