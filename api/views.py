@@ -232,7 +232,7 @@ class WithdrawFromWallet(APIView):
 
                     if result.get('ResponseCode').strip() == '0':
                         withdrawal_request = B2CWithdrawalRequest.objects.create(
-                            account_no=data.get('username'),
+                            account_no=data.get('store_wallet_id'),
                             txn_id=result.get('ConversationID'),
                             txn_ref="",
                             amount=data.get('amount'),
