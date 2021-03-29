@@ -1,6 +1,7 @@
 import requests
 
 from api.auth import BearerTokenAuth
+from lipafair import settings
 from mpesa.mpesa_auth import MpesaBaseAuth
 
 
@@ -70,3 +71,8 @@ class C2B(MpesaBaseAuth):
         req = requests.post(url=url, headers=headers, auth=BearerTokenAuth(self._access_token), json=payload)
 
         return req.json()
+
+if __name__ == '__main__':
+    c2b = C2B(env="sandbox",consumer_key=settings.MPESA_CONSUMER_SANDBOX, consumer_secret=settings.MPESA_SECRET_SANDBOX)
+    res = c2b.simulate_c2b(short_code=settings.B2C_SANDBOX_PAYBILL, command_id="CustomerPayBillOnline", amount=50, phone_number=settings.MPESA_B2C_TEST_MSISDN, bill_ref_no="Test")
+    print(res)

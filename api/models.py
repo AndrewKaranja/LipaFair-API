@@ -98,7 +98,7 @@ def on_stk_checkout_completed(sender, **kwargs):
         #implement other checkout here
         payload = {
             "accountNo": str(transaction.account),
-            "amount": int(transaction.ammount),
+            "amount": int(transaction.amount),
             "transactionType": "credit"
         }
 
@@ -118,7 +118,7 @@ def on_checkout_from_wallet_completed(sender, **kwargs):
 
     payload = {
         "accountNo": str(transaction.account),
-        "amount": int(transaction.ammount),
+        "amount": int(transaction.amount),
         "transactionType": "credit"
     }
 
@@ -132,7 +132,7 @@ def on_wallet_withdrawal_completed(sender, **kwargs):
     transaction = kwargs.get('transaction')
     payload = {
         "accountNo": str(transaction.account),
-        "amount": int(transaction.ammount),
+        "amount": int(transaction.amount),
         "transactionType": "debit"
     }
     wallet_manager = StoreWalletManager()

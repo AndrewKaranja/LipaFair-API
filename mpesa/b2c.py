@@ -47,3 +47,9 @@ class B2C(MpesaBaseAuth):
         url = f"{self._base_url}/mpesa/b2c/v1/paymentrequest"
         req = self.session.post(url=url, json=payload, headers=headers, auth=auth)
         return req.json()
+
+if __name__ == '__main__':
+   b2c = B2C()
+
+   res = b2c.initiate_b2c(phone_number=settings.MPESA_B2C_TEST_MSISDN, amount=10, occasion="payment")
+   print(res)

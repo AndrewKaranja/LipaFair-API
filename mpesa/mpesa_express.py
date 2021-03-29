@@ -87,3 +87,10 @@ class MpesaExpress(MpesaBaseAuth):
         url = "{0}{1}".format(self._base_url, "/mpesa/stkpushquery/v1/query")
         r = self.session.post(url=url, headers=headers, json=payload)
         return r.json()
+
+
+if __name__ == '__main__':
+    push = MpesaExpress(consumer_secret=settings.MPESA_SECRET_SANDBOX, consumer_key=settings.MPESA_CONSUMER_SANDBOX)
+    res = push.stk_push(business_shortcode=settings.MPESA_SHORT_CODE_SANDBOX, lnm_passkey=settings.LNM_PASSKEY_SANDBOX,
+                        phone_number="254712102388", description="test", amount=10, callback_url=settings.B2C_SANDBOX_CALLBACK_URL)
+    print(res)
