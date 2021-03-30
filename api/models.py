@@ -131,7 +131,7 @@ checkout_from_wallet_completed.connect(on_checkout_from_wallet_completed)
 def on_wallet_withdrawal_completed(sender, **kwargs):
     transaction = kwargs.get('transaction')
     payload = {
-        "accountNo": str(transaction.account),
+        "accountNo": str(transaction.account_no),
         "amount": int(transaction.amount),
         "transactionType": "debit"
     }
