@@ -279,7 +279,7 @@ class WalletWithdrawalCallback(APIView):
 
                     txn.status = 'success'
                     txn.txn_ref = str(callback_result.get('TransactionID'))
-                    txn.customer_name = callback_result.get('ResultParameters').get('ResultParameter')[2].get('Value')
+                    txn.customer_name = callback_result.get('ResultParameters').get('ResultParameter')[4].get('Value')
 
                     txn.save()
 
