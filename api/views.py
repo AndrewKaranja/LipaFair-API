@@ -180,7 +180,7 @@ class AllTransactionsListAPIView(APIView):
             data.append(
                 {
                     "user_id": txn.user_id,
-                    "txn_id": txn.txn_id,
+                    "txn_id": txn.mpesa_receipt,
                     "amount": txn.amount,
                     "account": txn.account,
                     "txn_type": txn.txn_type,
