@@ -3,6 +3,8 @@ from _decimal import Decimal
 from django.db import models
 
 # Create your models here.
+from picklefield import PickledObjectField
+
 from api.tariffs import B2CTariffManager
 from api.wallet_manager import StoreWalletManager
 from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed, b2c_payment_completed
@@ -111,6 +113,7 @@ class Coupon(models.Model):
     times_redeemed = models.PositiveSmallIntegerField(default=0)
     # timestamp for upto when the coupon is valid
     redeem_by = models.PositiveSmallIntegerField()
+    applies_to = PickledObjectField(null=True, blank=True)
     valid = models.BooleanField(default=True)
 
     class Meta:
