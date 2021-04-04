@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.views import APIView
 
-from api.models import Wallet, MpesaTransaction, WalletTransaction, B2CWithdrawalRequest
-from api.serializers import WalletSerializer, MpesaTransactionSerializer, B2CTransactionSerializer
+from api.models import Wallet, MpesaTransaction, WalletTransaction, B2CWithdrawalRequest, Coupon
+from api.serializers import WalletSerializer, MpesaTransactionSerializer, B2CTransactionSerializer, CouponSerializer
 from api.tariffs import B2CTariffManager
 from api.wallet_manager import StoreWalletManager
 from lipafair import settings
@@ -167,12 +167,11 @@ class TransactionsListAPIView(generics.ListAPIView):
         return MpesaTransaction.objects.filter(user_id=self.kwargs.get('user_id', '')).order_by('txn_date')
 
 
-
 class AllTransactionsListAPIView(APIView):
     def get(self, request, *args, **kwargs):
         user_id = kwargs.get('user_id', '')
 
-        mpesa_txns = MpesaTransaction.objects.filter(user_id=user_id,status='success')
+        mpesa_txns = MpesaTransaction.objects.filter(user_id=user_id, status='success')
         wallet_txns = WalletTransaction.objects.filter(user_id=user_id, status='success')
         print(mpesa_txns)
         print(wallet_txns)
@@ -187,7 +186,6 @@ class AllTransactionsListAPIView(APIView):
                     "txn_type": txn.txn_type,
                     "status": txn.status,
                     "txn_date": txn.txn_date.strftime("%d/%m/%Y %H:%M:%S")
-
 
                 }
             )
@@ -209,13 +207,13 @@ class AllTransactionsListAPIView(APIView):
         return Response(data=data, status=status.HTTP_200_OK)
 
 
-
 class B2CTransactionListView(generics.ListAPIView):
     serializer_class = B2CTransactionSerializer
 
     def get_queryset(self):
         account = self.kwargs.get('account', '')
         return B2CWithdrawalRequest.objects.filter(account_no=account)
+
 
 class CheckoutFromWalletAPIView(APIView):
     def post(self, request, *args, **kwargs):
@@ -226,7 +224,7 @@ class CheckoutFromWalletAPIView(APIView):
 
         try:
             client_wallet = Wallet.objects.get(wallet_id=client_wallet_id)
-            #check the available balance now
+            # check the available balance now
 
             balance = int(client_wallet.current_balance)
             if balance >= int(amount):
@@ -255,8 +253,6 @@ class CheckoutFromWalletAPIView(APIView):
             })
 
 
-
-
 class WithdrawFromWallet(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -264,22 +260,24 @@ class WithdrawFromWallet(APIView):
 
         amount = int(data.get('amount', 0))
 
-        #get the store
+        # get the store
         manager = StoreWalletManager()
         tariff_manager = B2CTariffManager()
         charges = tariff_manager.get_charges(amount=amount)
         if charges is not None:
             wallet_data = dict(manager.get_wallet(account_no=store_wallet_id))
             if wallet_data.get('status') == status.HTTP_200_OK:
-                available_balance = int(wallet_data.get('amount',  0))
+                available_balance = int(wallet_data.get('amount', 0))
                 net_amount = amount + charges
-                if available_balance >=net_amount:
-                    #funds available for withdrawal
+                if available_balance >= net_amount:
+                    # funds available for withdrawal
 
                     b2c_api = B2C(env=settings.MPESA_ENV)
-                    phone_number = settings.MPESA_B2C_TEST_MSISDN if settings.MPESA_ENV == 'sandbox' else data.get('phone_number')
+                    phone_number = settings.MPESA_B2C_TEST_MSISDN if settings.MPESA_ENV == 'sandbox' else data.get(
+                        'phone_number')
 
-                    result = dict(b2c_api.initiate_b2c(phone_number=phone_number, amount=data.get('amount'),occasion=data.get('occasion')))
+                    result = dict(b2c_api.initiate_b2c(phone_number=phone_number, amount=data.get('amount'),
+                                                       occasion=data.get('occasion')))
 
                     print(result)
                     if result.__contains__("ResponseCode"):
@@ -319,7 +317,6 @@ class WithdrawFromWallet(APIView):
             })
 
 
-
 class WalletWithdrawalCallback(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -332,7 +329,7 @@ class WalletWithdrawalCallback(APIView):
                 txn = B2CWithdrawalRequest.objects.get(txn_id=txn_id, status='pending')
                 if txn:
                     if txn.status == 'pending':
-                        #send a signal to update the wallet signal should be sent once. that is why we send it before switching from pending to success status
+                        # send a signal to update the wallet signal should be sent once. that is why we send it before switching from pending to success status
                         b2c_payment_completed.send(sender=self.__class__, transaction=txn)
 
                     txn.status = 'success'
@@ -349,5 +346,27 @@ class WalletWithdrawalCallback(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data={"message": "Unable to complete your request for now."})
 
+
+class CouponsListCreateView(generics.ListCreateAPIView):
+    serializer_class = CouponSerializer
+
+    def get_queryset(self):
+        return Coupon.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CouponDetailView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_url_kwarg = 'coupon_id'
+    lookup_field = 'coupon_id'
+    serializer_class = CouponSerializer
+    queryset = Coupon.objects.all()
 
 

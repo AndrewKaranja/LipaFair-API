@@ -104,7 +104,7 @@ class Coupon(models.Model):
     duration_in_months = models.PositiveSmallIntegerField(null=True, blank=True)
     # name which will be displayed to customers eg 25% off
     name = models.CharField(max_length=32, )
-    percent_off = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
+    percent_off = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     # indicate if the coupon is live or on test mode. true means it is used on production environment
     livemode = models.BooleanField(default=False)
     # max number of times a coupon can be redeemed.
@@ -113,7 +113,6 @@ class Coupon(models.Model):
     times_redeemed = models.PositiveSmallIntegerField(default=0)
     # timestamp for upto when the coupon is valid
     redeem_by = models.PositiveSmallIntegerField()
-    applies_to = PickledObjectField(null=True, blank=True)
     valid = models.BooleanField(default=True)
 
     class Meta:

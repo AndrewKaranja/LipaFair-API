@@ -36,3 +36,26 @@ class B2CTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = B2CWithdrawalRequest
         fields = '__all__'
+
+
+class CouponSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Coupon
+        fields = (
+            'id',
+            'coupon_id',
+            'amount_off',
+            'percent_off',
+            'currency',
+            'created',
+            'duration',
+            'duration_in_months',
+            'name',
+            'livemode',
+            'max_redemptions',
+            'times_redeemed',
+            'redeem_by',
+            'valid'
+
+        )
