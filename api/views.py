@@ -9,7 +9,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 
 from api.models import Wallet, MpesaTransaction, WalletTransaction, B2CWithdrawalRequest
-from api.serializers import WalletSerializer, MpesaTransactionSerializer
+from api.serializers import WalletSerializer, MpesaTransactionSerializer, B2CTransactionSerializer
 from api.wallet_manager import StoreWalletManager
 from lipafair import settings
 from mpesa.b2c import B2C
@@ -208,6 +208,13 @@ class AllTransactionsListAPIView(APIView):
         return Response(data=data, status=status.HTTP_200_OK)
 
 
+
+class B2CTransactionListView(generics.ListAPIView):
+    serializer_class = B2CTransactionSerializer
+
+    def get_queryset(self):
+        account = self.kwargs.get('account', '')
+        return B2CWithdrawalRequest.objects.filter(account_no=account)
 
 class CheckoutFromWalletAPIView(APIView):
     def post(self, request, *args, **kwargs):

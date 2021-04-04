@@ -32,3 +32,7 @@ class TransactionSerializer(serializers.Serializer):
         pass
 
 
+class B2CTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = B2CWithdrawalRequest
+        fields = '__all__'
