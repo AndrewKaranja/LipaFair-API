@@ -30,3 +30,14 @@ class WalletTransactionAdmin(admin.ModelAdmin):
 class WalletTransactionAdmin(admin.ModelAdmin):
     list_display = [field.name for field in B2CWithdrawalRequest._meta.get_fields()][1:]
 
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Coupon._meta.get_fields()][1:]
+
+@admin.register(Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Discount._meta.get_fields()][1:]
+
+
+

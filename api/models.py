@@ -86,7 +86,7 @@ class B2CWithdrawalRequest(models.Model):
 
 
 class Coupon(models.Model):
-    coupon_id = models.CharField(max_length=6, unique=True, )
+    coupon_id = models.CharField(max_length=32, unique=True, )
     amount_off = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     currency = models.CharField(max_length=3, null=True, blank=True)
     # timestamp when the coupon was created.
