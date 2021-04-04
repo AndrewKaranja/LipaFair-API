@@ -22,6 +22,7 @@ django-cors-headers==3.0.2
 django-crispy-forms==1.7.2
 django-filter==2.1.0
 django-ipware==2.1.0
+django-picklefield==3.0.1
 django-rest-auth==0.9.5
 django-session-timeout==0.0.4
 django-storages==1.7.1
