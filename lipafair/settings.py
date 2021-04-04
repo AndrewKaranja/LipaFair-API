@@ -179,3 +179,5 @@ UPDATE_STORE_WALLET_ENDPOINT = "https://us-central1-lipa-fare-c7c76.cloudfunctio
 STORE_WALLET_URL = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/wallet/"
 
 COUPON_CODE_LENGTH = 8
+
+TARIFF_URL = 'https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/tariffs'

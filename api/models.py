@@ -3,6 +3,7 @@ from _decimal import Decimal
 from django.db import models
 
 # Create your models here.
+from api.tariffs import B2CTariffManager
 from api.wallet_manager import StoreWalletManager
 from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed, b2c_payment_completed
 
@@ -176,9 +177,12 @@ checkout_from_wallet_completed.connect(on_checkout_from_wallet_completed)
 
 def on_wallet_withdrawal_completed(sender, **kwargs):
     transaction = kwargs.get('transaction')
+    manager = B2CTariffManager()
+    charges = manager.get_charges(int(transaction.amount))
+    net_amount = int(transaction.amount) + charges
     payload = {
         "accountNo": str(transaction.account_no),
-        "amount": int(transaction.amount),
+        "amount":net_amount ,
         "transactionType": "debit"
     }
     wallet_manager = StoreWalletManager()

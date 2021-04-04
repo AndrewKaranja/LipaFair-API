@@ -48,6 +48,9 @@ class B2C(MpesaBaseAuth):
         req = self.session.post(url=url, json=payload, headers=headers, auth=auth)
         return req.json()
 
+
+
+
 if __name__ == '__main__':
    b2c = B2C()
 
