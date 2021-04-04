@@ -129,6 +129,9 @@ class Discount(models.Model):
     applied= models.BooleanField(default=False,)
     date_applied = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        unique_together = ('customer_id', 'coupon')
+
     def __str__(self):
         return f"{self.coupon.name} Discount Coupon applied"
 
