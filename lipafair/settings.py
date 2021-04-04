@@ -177,3 +177,5 @@ FIREBASE_FUNC_AUTH_URL = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net
 UPDATE_STORE_WALLET_ENDPOINT = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/update-wallet"
 
 STORE_WALLET_URL = "https://us-central1-lipa-fare-c7c76.cloudfunctions.net/api/wallet/"
+
+COUPON_CODE_LENGTH = 8

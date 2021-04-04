@@ -1,3 +1,9 @@
+import string
+import secrets
+
+from lipafair import settings
+
+
 class CleanPhoneNumber(object):
     def __init__(self, phone_number):
         self.phone_number = phone_number
@@ -43,3 +49,10 @@ class CleanPhoneNumber(object):
 
         else:
             return ''
+
+
+def generate_coupon_code():
+    alphabet = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(alphabet) for i in range(settings.COUPON_CODE_LENGTH))
+
+
