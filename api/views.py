@@ -1,6 +1,7 @@
 import uuid
 from _decimal import Decimal
 
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.views import APIView
 
-from api.models import Wallet, MpesaTransaction, WalletTransaction, B2CWithdrawalRequest, Coupon
+from api.models import Wallet, MpesaTransaction, WalletTransaction, B2CWithdrawalRequest, Coupon, Discount
 from api.serializers import WalletSerializer, MpesaTransactionSerializer, B2CTransactionSerializer, CouponSerializer
 from api.tariffs import B2CTariffManager
 from api.wallet_manager import StoreWalletManager
@@ -368,5 +369,41 @@ class CouponDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'coupon_id'
     serializer_class = CouponSerializer
     queryset = Coupon.objects.all()
+
+
+class CreateDiscountView(APIView):
+    def post(self, request, *args, **kwargs):
+        data =request.data
+        customer_ids = list(data.get('customer_ids'))
+        coupon_id = data.get('coupon_id')
+        try:
+            coupon = Coupon.objects.get(coupon_id=coupon_id)
+
+            object_list = []
+
+            for customer_id in customer_ids:
+                object_list.append(Discount.objects.create(
+                    customer_id=customer_id,
+                    coupon=coupon
+
+                ))
+
+            Discount.objects.bulk_create(object_list)
+
+            return Response(status=status.HTTP_201_CREATED, data={
+                "message": "Discount created successfully for the specified customers"
+            })
+
+
+        except (Coupon.DoesNotExist, IntegrityError) as  e:
+            print(e)
+            if isinstance(e, Coupon.DoesNotExist):
+                error = "Could not find a matching coupon."
+            elif isinstance(e, IntegrityError):
+                error = "Duplicate discount records found."
+            else:
+                error  = "Internal server error occurred"
+
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": error})
 
 

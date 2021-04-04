@@ -59,3 +59,17 @@ class CouponSerializer(serializers.ModelSerializer):
             'valid'
 
         )
+
+
+class DiscountSerializer(serializers.ModelSerializer):
+    coupon = CouponSerializer(read_only=True, many=False,)
+
+    class Meta:
+        model = Discount
+        fields = (
+            'id',
+            'customer_id',
+            'coupon',
+            'applied',
+            'date_applied'
+        )
