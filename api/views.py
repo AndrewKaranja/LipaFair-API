@@ -166,6 +166,49 @@ class TransactionsListAPIView(generics.ListAPIView):
         return MpesaTransaction.objects.filter(user_id=self.kwargs.get('user_id', '')).order_by('txn_date')
 
 
+
+class AllTransactionsListAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        user_id = kwargs.get('user_id', '')
+
+        mpesa_txns = MpesaTransaction.objects.filter(user_id=user_id,status='success')
+        wallet_txns = WalletTransaction.objects.filter(user_id=user_id, status='success')
+        print(mpesa_txns)
+        print(wallet_txns)
+        data = []
+        for txn in mpesa_txns:
+            data.append(
+                {
+                    "user_id": txn.user_id,
+                    "txn_id": txn.txn_id,
+                    "amount": txn.amount,
+                    "account": txn.account,
+                    "txn_type": txn.txn_type,
+                    "status": txn.status,
+                    "txn_date": txn.txn_date.strftime("%d/%m/%Y %H:%M:%S")
+
+
+                }
+            )
+
+        for txn in wallet_txns:
+            data.append(
+                {
+                    "user_id": txn.user_id,
+                    "txn_id": txn.txn_id,
+                    "amount": txn.amount,
+                    "account": txn.account,
+                    "txn_type": txn.txn_type,
+                    "status": txn.status,
+                    "txn_date": txn.txn_date.strftime("%d/%m/%Y %H:%M:%S")
+
+                }
+            )
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+
 class CheckoutFromWalletAPIView(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data

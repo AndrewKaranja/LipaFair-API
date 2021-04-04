@@ -40,7 +40,7 @@ class MpesaTransaction(models.Model):
 
 
     class Meta:
-        ordering = ('-txn_date', )
+        ordering = ('txn_date', )
 
     def __str__(self):
         return self.txn_id
@@ -60,7 +60,7 @@ class WalletTransaction(models.Model):
     txn_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ('-txn_date', )
+        ordering = ('txn_date', )
 
     def __str__(self):
         return self.txn_id
