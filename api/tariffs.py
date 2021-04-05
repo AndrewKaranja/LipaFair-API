@@ -34,7 +34,6 @@ class B2CTariffManager(RequestSession):
             req = self.session.get(url=self.tariff_url, auth=BearerTokenAuth(token=token))
             if req.status_code == status.HTTP_200_OK:
                 data = req.json()
-                print(data)
                 for item in data:
                     if int(item.get('min')) <= int(amount) <= int(item.get('max')):
                         charges = int(item.get('charges'))

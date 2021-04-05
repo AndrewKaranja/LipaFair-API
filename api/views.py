@@ -433,36 +433,9 @@ class CustomerDiscountView(generics.ListAPIView):
     serializer_class = DiscountSerializer
     def get_queryset(self):
         customer_id = self.kwargs.get('customer_id', '')
-        return Discount.objects.filter(customer_id=customer_id, applied=False)
+        return Discount.objects.filter(customer_id=customer_id, coupon__valid=True, applied=False)
 
 
 
-class RedeemCouponView(APIView):
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        discount_id = data.get('discount_id', '')
 
-        try:
-            discount = Discount.objects.get(id=discount_id)
-            if not discount.applied:
-                if discount.coupon.valid:
-                    discount.applied = True
-                    discount.date_applied = datetime.datetime.now()
-                    discount.coupon.times_redeemed +=1
-                    discount.save()
-                    return Response(status=status.HTTP_200_OK, data={
-                        "message": "Coupon has been applied."
-                    })
-                else:
-                    return Response(status=status.HTTP_400_BAD_REQUEST, data={
-                        "message": "Coupon for this discount is invalid."
-                    })
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={
-                    "message": "This coupon has been redeemed already."
-                })
-
-
-        except Discount.DoesNotExist as e:
-            pass
 
