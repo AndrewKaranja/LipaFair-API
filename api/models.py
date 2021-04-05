@@ -98,7 +98,7 @@ class Coupon(models.Model):
     amount_off = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     currency = models.CharField(max_length=3, null=True, blank=True)
     # timestamp when the coupon was created.
-    created = models.PositiveIntegerField()
+    created = models.FloatField()
     COUPON_DURATION = (
         ('once', 'once'),
         ('repeating', 'repeating'),
@@ -113,11 +113,11 @@ class Coupon(models.Model):
     # indicate if the coupon is live or on test mode. true means it is used on production environment
     livemode = models.BooleanField(default=False)
     # max number of times a coupon can be redeemed.
-    max_redemptions = models.PositiveSmallIntegerField(default=1, )
+    max_redemptions = models.PositiveIntegerField(default=1, )
     # no of times the coupon has been redeemed
-    times_redeemed = models.PositiveSmallIntegerField(default=0)
+    times_redeemed = models.PositiveIntegerField(default=0)
     # timestamp for upto when the coupon is valid
-    redeem_by = models.PositiveSmallIntegerField()
+    redeem_by = models.FloatField()
     valid = models.BooleanField(default=True)
 
     class Meta:
