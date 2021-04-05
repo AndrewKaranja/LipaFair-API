@@ -409,7 +409,7 @@ class CreateDiscountView(APIView):
             if isinstance(e, Coupon.DoesNotExist):
                 error = "Could not find a matching coupon."
             elif isinstance(e, IntegrityError):
-                error = "Duplicate discount records found."
+                error = "This promo code has been used already."
             else:
                 error  = "Internal server error occurred"
 
