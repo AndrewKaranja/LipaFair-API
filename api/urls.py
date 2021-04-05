@@ -16,4 +16,8 @@ urlpatterns = [
     path('withdraw-from-wallet-callback/', views.WalletWithdrawalCallback.as_view()),
     path('coupons/', views.CouponsListCreateView.as_view()),
     path('coupons/<coupon_id>/', views.CouponDetailView.as_view()),
+    path('create-discount/', views.CreateDiscountView.as_view()),
+    path('discounts/', views.DiscountListView.as_view()),
+    path('discounts/<id>/', views.DiscountDetailView.as_view()),
+    path('customer-discounts/<customer_id>/', views.CustomerDiscountView.as_view()),
 ]

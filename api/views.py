@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from _decimal import Decimal
 
@@ -10,7 +11,8 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 
 from api.models import Wallet, MpesaTransaction, WalletTransaction, B2CWithdrawalRequest, Coupon, Discount
-from api.serializers import WalletSerializer, MpesaTransactionSerializer, B2CTransactionSerializer, CouponSerializer
+from api.serializers import WalletSerializer, MpesaTransactionSerializer, B2CTransactionSerializer, CouponSerializer, \
+    DiscountSerializer
 from api.tariffs import B2CTariffManager
 from api.wallet_manager import StoreWalletManager
 from lipafair import settings
@@ -379,20 +381,27 @@ class CreateDiscountView(APIView):
         try:
             coupon = Coupon.objects.get(coupon_id=coupon_id)
 
-            object_list = []
+            if coupon.valid:
 
-            for customer_id in customer_ids:
-                object_list.append(Discount.objects.create(
-                    customer_id=customer_id,
-                    coupon=coupon
+                object_list = []
 
-                ))
+                for customer_id in customer_ids:
+                    object_list.append(Discount(
+                        customer_id=customer_id,
+                        coupon=coupon
 
-            Discount.objects.bulk_create(object_list)
+                    ))
 
-            return Response(status=status.HTTP_201_CREATED, data={
-                "message": "Discount created successfully for the specified customers"
-            })
+                Discount.objects.bulk_create(object_list)
+
+                return Response(status=status.HTTP_201_CREATED, data={
+                    "message": "Discount created successfully for the specified customers"
+                })
+
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                    "message": "Invalid coupon. Either the coupon has expired or is not valid to be used. Please try again with a valid coupon"
+                })
 
 
         except (Coupon.DoesNotExist, IntegrityError) as  e:
@@ -406,4 +415,54 @@ class CreateDiscountView(APIView):
 
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": error})
 
+
+
+
+class DiscountListView(generics.ListAPIView):
+    serializer_class = DiscountSerializer
+    def get_queryset(self):
+        return Discount.objects.all()
+
+class DiscountDetailView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_url_kwarg = 'id'
+    lookup_field = 'id'
+    serializer_class = DiscountSerializer
+    queryset = Discount.objects.filter(coupon__valid=True)
+
+class CustomerDiscountView(generics.ListAPIView):
+    serializer_class = DiscountSerializer
+    def get_queryset(self):
+        customer_id = self.kwargs.get('customer_id', '')
+        return Discount.objects.filter(customer_id=customer_id, applied=False)
+
+
+
+class RedeemCouponView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        discount_id = data.get('discount_id', '')
+
+        try:
+            discount = Discount.objects.get(id=discount_id)
+            if not discount.applied:
+                if discount.coupon.valid:
+                    discount.applied = True
+                    discount.date_applied = datetime.datetime.now()
+                    discount.coupon.times_redeemed +=1
+                    discount.save()
+                    return Response(status=status.HTTP_200_OK, data={
+                        "message": "Coupon has been applied."
+                    })
+                else:
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                        "message": "Coupon for this discount is invalid."
+                    })
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                    "message": "This coupon has been redeemed already."
+                })
+
+
+        except Discount.DoesNotExist as e:
+            pass
 
