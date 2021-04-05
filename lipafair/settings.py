@@ -28,7 +28,7 @@ SECRET_KEY = 'o27e1-&cn1td3v9tn430t_ft%engv8$6h%=ec#)ek3(=g7e+z*'
 
 DEBUG = True
 
-PROD = False
+PROD = True
 
 if PROD:
     ALLOWED_HOSTS = ['.herokuapp.com']

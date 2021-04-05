@@ -1,11 +1,9 @@
+import datetime
 from _decimal import Decimal
 
 from django.db import models
 
 # Create your models here.
-from picklefield import PickledObjectField
-
-from api.coupons import CouponManager
 from api.tariffs import B2CTariffManager
 from api.wallet_manager import StoreWalletManager
 from mpesa.payment_signals import stk_payment_completed, checkout_from_wallet_completed, b2c_payment_completed
@@ -166,9 +164,17 @@ def on_stk_checkout_completed(sender, **kwargs):
 
             wallet_manager = StoreWalletManager()
             wallet_manager.update_wallet(payload=payload)
-            coupon_manager = CouponManager(discount_id=discount_id)
-            is_redeemed = coupon_manager.redeem_coupon()
-            print(f"redeemed coupon status: {is_redeemed}")
+            try:
+                discount = Discount.objects.get(id=discount_id)
+                discount.applied = True
+                discount.date_applied = datetime.datetime.now()
+                discount.coupon.times_redeemed += 1
+                discount.save()
+
+            except Discount.DoesNotExist as e:
+                print(e)
+                pass
+
         else:
 
             payload = {
