@@ -26,6 +26,9 @@ class MpesaTransaction(models.Model):
     txn_id = models.CharField(max_length=128, )
     mpesa_receipt = models.CharField(max_length=32, blank=True, null=True, default="")
     amount = models.DecimalField(decimal_places=2, max_digits=9)
+    discount_amount = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    coupon_code = models.CharField(max_length=32, blank=True, null=True)
+    discount_id = models.PositiveIntegerField(null=True, blank=True)
     reason = models.CharField(max_length=128, )
     account = models.CharField(max_length=128, default="")
     TXN_TYPES = (
@@ -53,6 +56,9 @@ class WalletTransaction(models.Model):
     user_id = models.CharField(max_length=128, null=False, blank=False)
     txn_id = models.CharField(max_length=128, null=False, blank=False)
     amount = models.DecimalField(decimal_places=2, max_digits=9)
+    discount_amount = models.DecimalField(decimal_places=2, max_digits=9, null=True, blank=True)
+    coupon_code = models.CharField(max_length=32, blank=True, null=True)
+    discount_id = models.PositiveIntegerField(null=True, blank=True)
     account = models.CharField(max_length=128, )
     txn_type = models.CharField(max_length=32, default="CheckoutFromWallet")
     TXN_STATUS = (

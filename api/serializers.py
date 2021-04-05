@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from api.models import *
+from mpesa.utils import generate_coupon_code
 
 
 class WalletSerializer(serializers.ModelSerializer):
@@ -39,7 +40,7 @@ class B2CTransactionSerializer(serializers.ModelSerializer):
 
 
 class CouponSerializer(serializers.ModelSerializer):
-
+    coupon_id = serializers.CharField(max_length=32, read_only=True)
     class Meta:
         model = Coupon
         fields = (
@@ -59,6 +60,11 @@ class CouponSerializer(serializers.ModelSerializer):
             'valid'
 
         )
+
+    def create(self, validated_data):
+        coupon_id = generate_coupon_code()
+        return Coupon.objects.create(coupon_id=coupon_id, **validated_data)
+
 
 
 class DiscountSerializer(serializers.ModelSerializer):
