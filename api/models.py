@@ -202,7 +202,7 @@ def on_checkout_from_wallet_completed(sender, **kwargs):
     wallet_bal_update_amt = int(transaction.amount)
     if discount_id:
         net_amount = int(transaction.amount) + int(transaction.discount_amount)
-        wallet_bal_update_amt = int(transaction.amount) - int(transaction.discount_amount)
+        wallet_bal_update_amt = net_amount - int(transaction.discount_amount)
 
 
         try:
