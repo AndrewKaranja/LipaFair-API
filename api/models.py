@@ -198,8 +198,10 @@ def on_checkout_from_wallet_completed(sender, **kwargs):
     client_wallet = kwargs.get('client_wallet')
 
     discount_id = transaction.discount_id
+    net_amount = int(transaction.amount)
     wallet_bal_update_amt = int(transaction.amount)
     if discount_id:
+        net_amount = int(transaction.amount) + int(transaction.discount_amount)
         wallet_bal_update_amt = int(transaction.amount) - int(transaction.discount_amount)
 
 
@@ -215,7 +217,7 @@ def on_checkout_from_wallet_completed(sender, **kwargs):
             pass
     payload = {
         "accountNo": str(transaction.account),
-        "amount": int(transaction.amount),
+        "amount": net_amount,
         "transactionType": "credit"
     }
 
