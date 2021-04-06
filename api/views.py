@@ -108,6 +108,9 @@ class DirectSTKCheckoutRequest(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         amount = data.get('amount', '')
+        discount_amount = data.get('discount_amount', '')
+        discount_id = data.get('discount_id', '')
+        coupon_code = data.get('coupon_code','')
         user_id = data.get('user_id', '')
         phone_number = data.get('phone_number', '')
         account = data.get('account', '')
@@ -121,6 +124,9 @@ class DirectSTKCheckoutRequest(APIView):
                 txn_id=response.get('CheckoutRequestID'),
                 reason="Direct checkout",
                 amount=Decimal(amount),
+                discount_amount=Decimal(discount_amount),
+                discount_id=discount_id,
+                coupon_code=coupon_code,
                 account=account,
                 txn_type="Checkout"
 
