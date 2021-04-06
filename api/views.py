@@ -109,7 +109,7 @@ class DirectSTKCheckoutRequest(APIView):
         #get data from request
         data = request.data
         amount = data.get('amount', '')
-        discount_amount = data.get('discount_amount', '')
+        discount_amount = data.get('discount_amount', 0)
         discount_id = data.get('discount_id', '')
         coupon_code = data.get('coupon_code','')
         user_id = data.get('user_id', '')
