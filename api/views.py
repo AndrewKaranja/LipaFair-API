@@ -106,6 +106,7 @@ class TopUpWalletCallback(APIView):
 
 class DirectSTKCheckoutRequest(APIView):
     def post(self, request, *args, **kwargs):
+        #get data from request
         data = request.data
         amount = data.get('amount', '')
         discount_amount = data.get('discount_amount', '')
