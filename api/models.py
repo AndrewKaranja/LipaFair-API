@@ -196,17 +196,38 @@ def on_checkout_from_wallet_completed(sender, **kwargs):
     transaction = kwargs.get('transaction')
 
     client_wallet = kwargs.get('client_wallet')
-    client_wallet.current_balance -= Decimal(transaction.amount)
-    client_wallet.save()
 
+    discount_id = transaction.discount_id
+    net_amount = int(transaction.amount)
+    wallet_bal_update_amt = int(transaction.amount)
+    if discount_id:
+        net_amount = int(transaction.amount) + int(transaction.discount_amount)
+        wallet_bal_update_amt = int(transaction.amount) - int(transaction.discount_amount)
+
+
+        try:
+            discount = Discount.objects.get(id=discount_id)
+            discount.applied = True
+            discount.date_applied = datetime.datetime.now()
+            discount.coupon.times_redeemed += 1
+            discount.save()
+
+        except Discount.DoesNotExist as e:
+            print(e)
+            pass
     payload = {
         "accountNo": str(transaction.account),
-        "amount": int(transaction.amount),
+        "amount": net_amount,
         "transactionType": "credit"
     }
 
     wallet_manager = StoreWalletManager()
     print(wallet_manager.update_wallet(payload=payload))
+
+    client_wallet.current_balance -= Decimal(wallet_bal_update_amt)
+    client_wallet.save()
+
+
 
 
 checkout_from_wallet_completed.connect(on_checkout_from_wallet_completed)

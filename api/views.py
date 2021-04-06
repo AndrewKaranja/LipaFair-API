@@ -231,6 +231,9 @@ class CheckoutFromWalletAPIView(APIView):
         client_wallet_id = data.get('client_wallet_id')
         store_account_no = data.get('account_no')
         amount = data.get('amount')
+        discount_amount = data.get('discount_amount', 0)
+        discount_id = data.get('discount_id', '')
+        coupon_code = data.get('coupon_code', '')
 
         try:
             client_wallet = Wallet.objects.get(wallet_id=client_wallet_id)
@@ -243,6 +246,9 @@ class CheckoutFromWalletAPIView(APIView):
                     user_id=data.get('user_id'),
                     txn_id=uuid.uuid4().hex.upper(),
                     amount=amount,
+                    discount_amount=discount_amount,
+                    discount_id=discount_id,
+                    coupon_code=coupon_code,
                     account=store_account_no,
                     status="success"
                 )
