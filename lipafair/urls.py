@@ -23,5 +23,5 @@ urlpatterns = [
     path('api/', include('api.urls')),
 ]
 
-admin.site.site_header = _("LIPAFIAR Console")
-admin.site.site_title = _("LIPAFIAR Console")
+admin.site.site_header = _("LIPAFAIR Console")
+admin.site.site_title = _("LIPAFAIR Console")
