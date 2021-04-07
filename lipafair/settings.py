@@ -26,7 +26,7 @@ SECRET_KEY = 'o27e1-&cn1td3v9tn430t_ft%engv8$6h%=ec#)ek3(=g7e+z*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+DEBUG = False
 
 PROD = True
 
