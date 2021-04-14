@@ -24,7 +24,7 @@ class MpesaBaseAuth(RequestSession):
             self.cert_path = os.path.join(BASE_DIR, 'mpesa/mpesa_sandbox_cert.cer')
 
         elif env == "live":
-            self.initiator_password = settings.MPESA_SANBOX_PASSWORD
+            self.initiator_password = settings.B2C_INITIATOR_LIVE_PASSWORD
             self.cert_path = os.path.join(BASE_DIR, 'mpesa/mpesa_prod_cert.cer')
             self._base_url = "https://api.safaricom.co.ke"
         else:
